@@ -20,11 +20,9 @@ class SparkBench(Benchmark):
         print(f'sshpass scp {SPARK_CONF_PATH} {MASTER_ADDRESS}:{MASTER_CONF_PATH}')
         os.system(f'sshpass scp {SPARK_CONF_PATH} {MASTER_ADDRESS}:{MASTER_CONF_PATH}')
         os.system(f'sshpass ssh {MASTER_ADDRESS} {MASTER_BENCH_BASH}')
-#         os.system('sshpass scp /home/jieun/SparkTuning/spark.conf jieun@34.64.230.62:/home/jieun/HiBench/conf')
-#         os.system('sshpass ssh jieun@34.64.230.62 /home/jieun/scripts/run_terasort.sh')
     
     def get_results(self):
-        f = open('hibench.report', 'r')
+        f = open(HIBENCH_REPORT_PATH, 'r')
         report = f.readlines()
         f.close()
         duration = report[-1].split()[-3]
