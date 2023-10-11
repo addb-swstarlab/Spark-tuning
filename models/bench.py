@@ -1,4 +1,5 @@
 import os
+from models.configs import *
 from baxus.benchmarks.benchmark_function import Benchmark
 
 class SparkBench(Benchmark):
@@ -8,7 +9,6 @@ class SparkBench(Benchmark):
         self.bench_type = bench_type
     
     def __call__(self, x):
-        
         self.sp.save_configuration_file(x)
         self.execute_spark_bench()
         self.res, _ = self.get_results()
@@ -17,8 +17,11 @@ class SparkBench(Benchmark):
         
     def execute_spark_bench(self):
         # transport a generated configuration to the master server
-        os.system('sshpass scp spark.conf jieun@34.64.230.62:/home/jieun/HiBench/conf')
-        os.system('sshpass ssh jieun@34.64.230.62 /home/jieun/scripts/run_terasort.sh')
+        print(f'sshpass scp {SPARK_CONF_PATH} {MASTER_ADDRESS}:{MASTER_CONF_PATH}')
+        os.system(f'sshpass scp {SPARK_CONF_PATH} {MASTER_ADDRESS}:{MASTER_CONF_PATH}')
+        os.system(f'sshpass ssh {MASTER_ADDRESS} {MASTER_BENCH_BASH}')
+#         os.system('sshpass scp /home/jieun/SparkTuning/spark.conf jieun@34.64.230.62:/home/jieun/HiBench/conf')
+#         os.system('sshpass ssh jieun@34.64.230.62 /home/jieun/scripts/run_terasort.sh')
     
     def get_results(self):
         f = open('hibench.report', 'r')
