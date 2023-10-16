@@ -5,14 +5,29 @@ def get_filename(PATH, head, tail):
     i = 0
     today = datetime.datetime.now()
     today = today.strftime('%Y%m%d')
-    if not os.path.exists(os.path.join(PATH, today)):
-        os.mkdir(os.path.join(PATH, today))
+    os.makedirs(os.path.join(PATH, today), exist_ok=True)
+    # if not os.path.exists(os.path.join(PATH, today)):
+    #     os.mkdir(os.path.join(PATH, today))
     name = today+'/'+head+'-'+today+'-'+'%02d'%i+tail
     while os.path.exists(os.path.join(PATH, name)):
         i += 1
         name = today+'/'+head+'-'+today+'-'+'%02d'%i+tail
     return name
 
+def get_foldername(PATH):
+    i = 0
+    today = datetime.datetime.now()
+    today = today.strftime('%Y%m%d')
+    os.makedirs(PATH, exist_ok=True)
+    # if not os.path.exists(PATH):
+    #     os.mkdir(PATH)
+    folder_name = os.path.join(PATH, today + '-%02d'%i)
+    while os.path.exists(folder_name):
+        i += 1
+        folder_name = os.path.join(PATH, today + '-%02d'%i)
+    return folder_name
+        
+        
 def get_logger(log_path='./logs'):
     os.makedirs(log_path, exist_ok=True)
 
