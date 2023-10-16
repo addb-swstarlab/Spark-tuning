@@ -1,4 +1,4 @@
-import os
+import os, logging
 from models.configs import *
 from baxus.benchmarks.benchmark_function import Benchmark
 
@@ -12,12 +12,13 @@ class SparkBench(Benchmark):
         self.sp.save_configuration_file(x)
         self.execute_spark_bench()
         self.res, _ = self.get_results()
-        
-        return res
+        logging.info("########################")
+        logging.info(f"##### res: {self.res:.2f} ######")
+        logging.info("########################")
+        return self.res
         
     def execute_spark_bench(self):
         # transport a generated configuration to the master server
-        print(f'sshpass scp {SPARK_CONF_PATH} {MASTER_ADDRESS}:{MASTER_CONF_PATH}')
         os.system(f'sshpass scp {SPARK_CONF_PATH} {MASTER_ADDRESS}:{MASTER_CONF_PATH}')
         os.system(f'sshpass ssh {MASTER_ADDRESS} {MASTER_BENCH_BASH}')
     
@@ -25,6 +26,8 @@ class SparkBench(Benchmark):
         f = open(HIBENCH_REPORT_PATH, 'r')
         report = f.readlines()
         f.close()
+        
         duration = report[-1].split()[-3]
         tps = report[-1].split()[-2]
-        return duration, tps
+        
+        return float(duration), float(tps)
