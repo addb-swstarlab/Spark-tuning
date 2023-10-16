@@ -1,3 +1,6 @@
+import logging
+from models.configs import SPARK_CONF_TEMPLATE_PATH
+
 # dictionary = {'parameter_name': [[min, max], default]}
 CORES = 8
 
@@ -88,14 +91,14 @@ class SparkParameters():
                 self.ub.append(v[0][1])
     
     def _get_configuration_template(self):
-        f = open('spark.conf.template', 'r')
+        f = open(SPARK_CONF_TEMPLATE_PATH, 'r')
         self.conf_template = f.readlines()
         f.close()
     
     def save_configuration_file(self, values):
         conf_file = open('spark.conf', 'w')
         conf_file.writelines(self.conf_template)
-        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+        logging.info('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
         for i, p in enumerate(self.parameter_names):
             if p in self.boolean_parameters:
                 v = 'true' if round(values[i])==1 else 'false'
@@ -109,6 +112,6 @@ class SparkParameters():
                 v = round(values[i])
             
             conf_file.writelines(f'{p}={v}\n')
-            print(f'{p}={v}')
-        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+            logging.info(f'{p}={v}')
+        logging.info('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
         conf_file.close()
