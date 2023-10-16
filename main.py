@@ -10,20 +10,24 @@ from baxus.baxus import BAxUS
 from baxus.util.parsing import embedding_type_mapper, acquisition_function_mapper, mle_optimization_mapper
 
 from envs.spark import SparkParameters
-from models.utils import get_logger
+from models.utils import get_logger, get_foldername
 from models.bench import SparkBench
 from models.configs import baxus_params as bp
+import models.configs as cfg
 
-# parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
+parser.add_argument('-b', '--bo', type=str, default='baxus')
 # parser.add_argument('-t', '--test', type=str, default='test', help='description for this parameter')
 # parser.add_argument('-i', '--ints', type=int, default=5, help='description for this parameter')
 # parser.add_argument('-f', '--floats', type=float, default=0.5, help='description for this parameter')
 logger = get_logger()
+os.system('clear')
+opt = parser.parse_args()
+logger.info("## ARGUMENT INFORMATION ##")
+for _ in vars(opt):
+    logger.info(f"{_}: {vars(opt)[_]}")
 
-# opt = parser.parse_args()
-# logger.info("## ARGUMENT INFORMATION ##")
-# for _ in vars(opt):
-#     logger.info(f"{_}: {vars(opt)[_]}")
+os.makedirs(cfg.INCUMBENTS_RESULTS_PATH, exist_ok=True)
 
 def main():
     bin_sizing_method = embedding_type_mapper[bp['embedding_type']]
@@ -56,15 +60,23 @@ def main():
 
     f = SparkBench(dim=input_dim, ub=ub, lb=lb, sp=sp)
 
+    
+    
     optim = BAxUS(f=f,
                 n_init=bp['n_init'],
                 max_evals=bp['max_evals'],
                 target_dim=bp['target_dim'],
                 behavior=behavior,
-                gp_behaviour=gp_behaviour
+                gp_behaviour=gp_behaviour,
+                run_dir=get_foldername(os.path.join('bo-results', opt.bo))
                 )
 
     optim.optimize()
+    
+    incumbent_configs, incumbent_results = optim.optimization_results_incumbent()
+    np.save(os.path.join(cfg.INCUMBENTS_RESULTS_PATH, 'tuned_configs.npy'), incumbent_configs)
+    np.save(os.path.join(cfg.INCUMBENTS_RESULTS_PATH, 'tuned_results.npy'), incumbent_results)
+    
 
 if __name__ == '__main__':
     try:
