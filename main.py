@@ -10,7 +10,7 @@ from baxus.baxus import BAxUS
 from baxus.util.parsing import embedding_type_mapper, acquisition_function_mapper, mle_optimization_mapper
 
 from envs.spark import SparkParameters
-from models.utils import get_logger, get_foldername
+from models.utils import get_logger, get_foldername, get_filename
 from models.bench import SparkBench
 from models.configs import baxus_params as bp
 import models.configs as cfg
@@ -34,7 +34,7 @@ def main():
     acquisition_function = acquisition_function_mapper[bp['acquisition_function']]
     mle_optimization_method = mle_optimization_mapper[bp['mle_optimization']]
 
-    behavior = BaxusBehavior(n_new_bins=2,#new_bins_on_split,
+    behavior = BaxusBehavior(n_new_bins=bp['new_bins_on_split'],
                             initial_base_length=bp['l_init'],
                             min_base_length=bp['l_min'],
                             max_base_length=bp['l_max'],
@@ -74,8 +74,11 @@ def main():
     optim.optimize()
     
     incumbent_configs, incumbent_results = optim.optimization_results_incumbent()
-    np.save(os.path.join(cfg.INCUMBENTS_RESULTS_PATH, 'tuned_configs.npy'), incumbent_configs)
-    np.save(os.path.join(cfg.INCUMBENTS_RESULTS_PATH, 'tuned_results.npy'), incumbent_results)
+    np.save(get_filename(cfg.INCUMBENTS_RESULTS_PATH,'tuned_configs', '.npy'), incumbent_configs)
+    np.save(get_filename(cfg.INCUMBENTS_RESULTS_PATH,'tuned_results', '.npy'), incumbent_results)
+    
+    # np.save(os.path.join(cfg.INCUMBENTS_RESULTS_PATH, 'tuned_configs.npy'), incumbent_configs)
+    # np.save(os.path.join(cfg.INCUMBENTS_RESULTS_PATH, 'tuned_results.npy'), incumbent_results)
     
 
 if __name__ == '__main__':
